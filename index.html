@@ -227,6 +227,9 @@ table.std th small{display:block;font-weight:600;color:var(--pri)}
 .tl span.on{background:var(--kc)}
 .tlwrap .dot{position:absolute;top:0;width:3px;height:20px;border-radius:2px;background:var(--pri);transform:translateX(-50%)}
 .tlaxis{display:flex;justify-content:space-between;font-size:.72rem;font-weight:600;color:var(--faint)}
+.s-head{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap}
+.hbtn{flex:none;margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;font-size:.8rem;font-weight:700;border-radius:8px;border:2px solid var(--pri-200);background:var(--pri-50);color:var(--pri-d);text-decoration:none;white-space:nowrap}
+.hbtn:hover{background:var(--pri);border-color:var(--pri);color:#fff}
 </style>
 </head>
 <body>
@@ -238,19 +241,19 @@ table.std th small{display:block;font-weight:600;color:var(--pri)}
     </header>
     <div class="progress" aria-hidden="true"><div id="prog"></div></div>
     <nav class="pills" role="tablist" aria-label="Sections">
-      <button class="pill" role="tab" id="t-plan" aria-controls="plan"></button>
       <button class="pill" role="tab" id="t-std" aria-controls="std"></button>
-      <button class="pill" role="tab" id="t-tool" aria-controls="tool"></button>
-      <button class="pill" role="tab" id="t-guide" aria-controls="guide"></button>
       <button class="pill" role="tab" id="t-ld" aria-controls="ld"></button>
+      <button class="pill" role="tab" id="t-guide" aria-controls="guide"></button>
+      <button class="pill" role="tab" id="t-tool" aria-controls="tool"></button>
+      <button class="pill" role="tab" id="t-plan" aria-controls="plan"></button>
     </nav>
   </div>
   <main class="card">
-    <section role="tabpanel" id="plan" aria-labelledby="t-plan"></section>
     <section role="tabpanel" id="std" aria-labelledby="t-std" hidden></section>
-    <section role="tabpanel" id="tool" aria-labelledby="t-tool" hidden></section>
-    <section role="tabpanel" id="guide" aria-labelledby="t-guide" hidden></section>
     <section role="tabpanel" id="ld" aria-labelledby="t-ld" hidden></section>
+    <section role="tabpanel" id="guide" aria-labelledby="t-guide" hidden></section>
+    <section role="tabpanel" id="tool" aria-labelledby="t-tool" hidden></section>
+    <section role="tabpanel" id="plan" aria-labelledby="t-plan"></section>
   </main>
   <footer class="foot" id="foot"></footer>
 </div>
@@ -492,14 +495,14 @@ const UI={
  title:['PILOT OF THE LSTS SCIENTIFIC RESEARCH COMPETENCY ASSESSMENT TOOL','THỬ NGHIỆM ĐÁNH GIÁ CÔNG CỤ ĐÁNH GIÁ NĂNG LỰC NCKH LSTS'],
  c8:['Grade 8: Tier 2','Lớp 8: Bậc 2'],c10:['Grade 10: Tier 4','Lớp 10: Bậc 4'],
  section:['Section','Mục'],
- tabs:{plan:['Implementation plan','Kế hoạch triển khai'],std:['SR standards','Chuẩn NCKH'],tool:['Assessment tool','Công cụ đánh giá'],guide:['Guidelines','Hướng dẫn'],ld:['Learning design','Thiết kế dạy học']},
+ tabs:{plan:['Implementation plan','Kế hoạch triển khai'],std:['SR standards','Chuẩn NCKH'],tool:['Assessment tool','Công cụ đánh giá'],guide:['Assessment guidelines','Hướng dẫn đánh giá'],ld:['Learning design','Thiết kế dạy học']},
  foot:['CIEC AY26-27','CIEC AY26-27'],
  lv:[['Emerging','Bắt đầu'],['Developing','Đang phát triển'],['Proficient','Thành thạo'],['Extending','Mở rộng']]
 };
 const u=k=>T(UI[k][0],UI[k][1]);
 const kn=c=>`<span class="kn${CORE.includes(c)?'':' sup'}" data-d="${c}">${c}</span>`;
 function bullets(t){const l=String(t||'').split(/\n/).map(s=>s.replace(/^\s*-\s*/,'').trim()).filter(Boolean);return l.length>1?`<ul>${l.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:esc(l[0]||'')}
-const head=(meta,title)=>`<div class="s-head">${meta?`<span class="meta">${esc(meta)}</span>`:''}<h2>${esc(title)}</h2></div>`;
+const head=(meta,title,link)=>`<div class="s-head"><div>${meta?`<span class="meta">${esc(meta)}</span>`:''}<h2>${esc(title)}</h2></div>${link?`<a class="hbtn" href="${esc(link.url)}" target="_blank" rel="noopener noreferrer" title="${esc(link.title)}">${esc(link.label)} <span aria-hidden="true">↗</span></a>`:''}</div>`;
 const ul=a=>`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
 function subtabs(el,key,parts,top=''){let cur=Math.min(store.get('sub_'+key,0),parts.length-1);
  const draw=()=>{el.innerHTML=top+`<div class="tabs" role="tablist">${parts.map((p,i)=>`<button role="tab" data-sub="${i}" aria-selected="${i===cur}">${p.label}</button>`).join('')}</div><div class="sub fade-in">${parts[cur].html()}</div>`;
@@ -523,13 +526,13 @@ function renderPlan(){const P=VI()?PLAN_VI:PLAN;const O=P.options;
  {label:T('Validation criteria','Tiêu chí kiểm định'),html:()=>`<h3>${T('Validation design and success criteria','Thiết kế kiểm định và tiêu chí đạt')}</h3><div class="tbl"><table style="min-width:760px"><thead><tr><th>${T('Evidence','Minh chứng')}</th><th>${T('Method','Phương pháp')}</th><th>${T('Success criterion','Tiêu chí đạt')}</th></tr></thead><tbody>${P.validation.map((r,i)=>`<tr><td class="k">${i+1}. ${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</tbody></table></div><div class="notebox">${esc(P.readiness)}</div>`},
  {label:T('Roles','Phân công'),html:()=>`<h3>${T('Roles and responsibilities','Phân công thực hiện')}</h3>${Object.entries(P.roles).map(([k,v])=>`<article class="skill"><h3>${esc(k)}</h3>${ul(v)}</article>`).join('')}`},
  {label:T('Risks','Rủi ro'),html:()=>`<h3>${T('Risks and mitigation','Rủi ro và biện pháp')}</h3><div class="tbl"><table><thead><tr><th>${T('Risk','Rủi ro')}</th><th>${T('Mitigation','Biện pháp')}</th></tr></thead><tbody>${P.risks.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('')}</tbody></table></div>`}
- ],head('',T('Plan for implementation of the SR assessment pilot','Kế hoạch triển khai thử nghiệm đánh giá NCKH')));}
+ ],head('',T('Plan for implementation of the SR assessment pilot','Kế hoạch triển khai thử nghiệm đánh giá NCKH'),{label:'Link file',title:'CIEC 26 0107 Plan for implementation of the SR assessment pilot.docx',url:'https://dinhthienly.sharepoint.com/:w:/r/sites/repository/Shared%20Documents/General/CIEC/2026-2027/1.%20Work%20Items/16.%20LSTS%20Student%20Standards/01.%20Scientific%20Research/2.%20Plan%20-%20Finance/CIEC%2026%200107%20Plan%20for%20implementation%20of%20the%20SR%20assessment%20pilot.docx?d=we9fbe31c82fa496d9881eb8bdc67eaff&csf=1&web=1&e=zYXiHE'}));}
 
 /* ---------- standards ---------- */
 let dom=store.get('dom','A');
 function renderStd(){const el=$('#std');const D=DATA.domains.find(d=>d.code===dom);const L=o=>VI()?(o.vi||o.en):o.en;
  const tg={2:T('Grade 8 target','Mục tiêu lớp 8'),4:T('Grade 10 target','Mục tiêu lớp 10')};
- el.innerHTML=head('',T('LSTS Scientific Research Standards - Level descriptors','Chuẩn Nghiên cứu khoa học LSTS - Mô tả mức'))+
+ el.innerHTML=head('',T('LSTS Scientific Research Standards - Level descriptors','Chuẩn Nghiên cứu khoa học LSTS - Mô tả mức'),{label:'Link file',title:'CIEC 26 0929 Scientific Research Standards - Level descriptors - VI-EN v.2.xlsx',url:'https://dinhthienly.sharepoint.com/:x:/r/sites/repository/Shared%20Documents/General/CIEC/2026-2027/1.%20Work%20Items/16.%20LSTS%20Student%20Standards/01.%20Scientific%20Research/5.%20Others/CIEC%2026%200929%20Scientific%20Research%20Standards%20-%20Level%20descriptors%20-%20VI-EN%20v.2.xlsx?d=w1ea98b90abdb4ed0af5775f7bdf848aa&csf=1&web=1&e=TDUWXg'})+
  ` <div class="tabs dgrid" role="tablist">${DATA.domains.map(d=>`<button role="tab" data-dm="${d.code}" aria-selected="${d.code===dom}">${kn(d.code)} ${esc(L(d.title))}</button>`).join('')}</div>
  <div class="sub fade-in" data-d="${D.code}">
  <h3>${kn(D.code)} ${esc(L(D.title))}</h3>
@@ -542,7 +545,7 @@ function renderStd(){const el=$('#std');const D=DATA.domains.find(d=>d.code===do
 /* ---------- assessment tool ---------- */
 let form=store.get('form','MS');
 function renderTool(){const el=$('#tool');const F=DATA.forms[form];const FV=FORMS_VI[form];
- el.innerHTML=head('',T('Scoring Guide for LSTS SR Standards assessment','Hướng dẫn chấm đánh giá theo Chuẩn NCKH LSTS'))+
+ el.innerHTML=head('',T('Scoring Guide for LSTS SR Standards assessment','Hướng dẫn chấm đánh giá theo Chuẩn NCKH LSTS'),{label:'Link file',title:'CIEC 26 0929 LSTS SR assessment tool.v3.2.xlsx',url:'https://dinhthienly.sharepoint.com/:x:/r/sites/repository/Shared%20Documents/General/CIEC/2026-2027/1.%20Work%20Items/16.%20LSTS%20Student%20Standards/01.%20Scientific%20Research/5.%20Others/SR%20Assessment%20toolkit/SR%20assessment%20toolkit%20v2/CIEC%2026%200929%20LSTS%20SR%20assessment%20tool.v3.2.xlsx?d=wec383cc85a51414691a263b101409455&csf=1&web=1&e=jVHM6n'})+
  `<div class="tabs" role="tablist"><button role="tab" data-f="MS" aria-selected="${form==='MS'}">${T('MS form: Grade 8, Tier 2','Phiếu MS: Lớp 8, Bậc 2')}</button><button role="tab" data-f="HS" aria-selected="${form==='HS'}">${T('HS form: Grade 10, Tier 4','Phiếu HS: Lớp 10, Bậc 4')}</button></div>
  <div class="sub fade-in">
  <div class="legend">${UI.lv.map((l,i)=>`<span style="background:var(--l${i});${i===3?'color:var(--l3ink)':''}">${T(l[0],l[1])} (${i+1})</span>`).join('')}</div>
@@ -559,7 +562,7 @@ function renderGuide(){const G=VI()?GUIDE_VI:GUIDE;const gl=x=>T('Grade ','Lớp
  {label:T('Decision rules','Quy tắc kết luận'),html:()=>`<h3>${T('Core and supporting domains','Lĩnh vực cốt lõi và hỗ trợ')}</h3><p>${esc(G.coreText)}</p><p class="note">${esc(G.diag)}</p>
   <h3>${T('Overall decision rules (Table 5)','Quy tắc kết luận chung (Bảng 5)')}</h3><p class="note">${T('Apply from top to bottom; the first rule met gives the decision.','Áp dụng từ trên xuống; quy tắc đầu tiên được thỏa mãn cho kết luận.')}</p><div class="tbl"><table><thead><tr><th>${T('Decision','Kết luận')}</th><th>${T('Criteria','Tiêu chí')}</th><th>${T('Remediation target','Mục tiêu bồi dưỡng')}</th></tr></thead><tbody>${G.decisions.map(r=>`<tr><td class="k">${r[0]}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</tbody></table></div>
   <h4>${T('Examples (A-B-C-D)','Ví dụ (A-B-C-D)')}</h4><div>${G.examples.map(x=>`<span class="chip">${esc(x[0])}: <b>${x[1]}</b></span>`).join('')}</div>`}
- ],head('',T('Guidelines for Teachers','Hướng dẫn cho giáo viên'))+``);}
+ ],head('',T('Guidelines for Teachers','Hướng dẫn cho giáo viên'),{label:'Link file',title:'CIEC 26 0929 Scientific Research Standards - Guidelines for Teachers.v2.2.docx',url:'https://dinhthienly.sharepoint.com/:w:/r/sites/repository/Shared%20Documents/General/CIEC/2026-2027/1.%20Work%20Items/16.%20LSTS%20Student%20Standards/01.%20Scientific%20Research/5.%20Others/SR%20Assessment%20toolkit/SR%20assessment%20toolkit%20v2/CIEC%2026%200929%20Scientific%20Research%20Standards%20-%20Guidelines%20for%20Teachers.v2.2.docx?d=w774db0b9701e4f088b0881585ec8c94d&csf=1&web=1&e=3ZLNNo'})+``);}
 
 
 function fig3d(){
@@ -597,7 +600,7 @@ function renderLd(){const el=$('#ld');const L=DATA.ld[g];const LV=LD_VI[g];const
  const sname=i=>VI()?LD_VI.stages[i]:L.stages[i].stage;const SD=VI()?LV.detail[st]:S;
  const notes=VI()?LV.notes:L.notes;
  const cps=[...new Set(L.stages.flatMap(s=>[...s.checkpoint.matchAll(/\bWeek\s(\d+)\s–/g)].map(m=>+m[1])))].filter(w=>w<=total).sort((a,b)=>a-b);
- el.innerHTML=head('',T('SR learning design model map','Bản đồ mô hình thiết kế dạy học NCKH'))+
+ el.innerHTML=head('',T('SR learning design model map','Bản đồ mô hình thiết kế dạy học NCKH'),{label:'Link file',title:'CIEC 26 0706 SR learning design model_Map.xlsx',url:'https://dinhthienly.sharepoint.com/:x:/r/sites/repository/Shared%20Documents/General/CIEC/2026-2027/1.%20Work%20Items/16.%20LSTS%20Student%20Standards/01.%20Scientific%20Research/5.%20Others/CIEC%2026%200706%20SR%20learning%20design%20model_Map.xlsx?d=wc14952ea15fd4bf39b5d050881338a71&csf=1&web=1&e=3lWqv2'})+
  `<div class="tabs" role="tablist"><button role="tab" data-g="G8" aria-selected="${g==='G8'}">${T('Grade 8 (18 weeks)','Lớp 8 (18 tuần)')}</button><button role="tab" data-g="G10" aria-selected="${g==='G10'}">${T('Grade 10 (43 weeks)','Lớp 10 (43 tuần)')}</button></div>
  <div class="sub fade-in"><dl class="gen">${notes.map(n=>{const i=n.indexOf(':');return `<dt>${esc(n.slice(0,i))}</dt><dd>${esc(n.slice(i+1).trim())}</dd>`}).join('')}</dl>
  <div class="stages">${L.stages.map((s,i)=>`<button class="stage" data-d="${sd(s.primary)}" data-s="${i}" aria-pressed="${i===st}"><span class="sn">${T('Stage','Giai đoạn')} ${i+1}</span><span class="st">${esc(sname(i).replace(/^\d+\.\s*/,''))}</span><span class="sw">${esc(wk(s.weeks))}</span></button>`).join('')}</div>
@@ -629,7 +632,7 @@ function renderAll(){document.documentElement.lang=VI()?'vi':'en';
  if(curTab)openTab(curTab);}
 document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;store.set('ui_lang',lang);renderAll()});
 renderAll();
-const start=(location.hash||'').slice(1);openTab(['plan','std','tool','guide','ld'].includes(start)?start:store.get('tab','plan'));
+const start=(location.hash||'').slice(1);openTab(['plan','std','tool','guide','ld'].includes(start)?start:store.get('tab','std'));
 
 </script>
 </body>
